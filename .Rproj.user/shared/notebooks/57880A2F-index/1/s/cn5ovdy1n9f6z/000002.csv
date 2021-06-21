@@ -1,0 +1,8 @@
+"0","# Tabla de registros de presencia"
+"0","primates %>%"
+"0","  st_drop_geometry() %>%"
+"0","  select(family, species, stateProvince, canton, locality, eventDate) %>%"
+"0","  datatable("
+"0","    colnames = c(""Familia"",""Especie"",""Provincia"", ""Canton"", ""Localidad"", ""Fecha""),"
+"0","    options = list(searchHighlight = TRUE)"
+"0","  )"
