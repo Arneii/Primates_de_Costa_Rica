@@ -57,7 +57,7 @@ primates <-
 <br>
 
 # Introduccion
-Para esta tarea se utilisa el conjunto de datos sobre especies de primates de Costa Rica.
+Se utilisa el conjunto de datos sobre 4 especies de primates de Costa Rica.
 
 <br>
 
@@ -73,84 +73,8 @@ primates %>%
     options = list(searchHighlight = TRUE)
   )
 ```
-<br>
 
-# Graficos de estacionalidad
+# Gráfico de pastel
 
-```{r grafico_estacionaidad, message=FALSE, warning=FALSE}
-#grafico de estacionalidad por mes
-junco_vulcani %>%
-  st_drop_geometry() %>%
-  group_by(mes = format(as.Date(eventDate, "%Y-%m-%d"), "%m")) %>%
-  summarize(suma_registros = n()) %>%
-  filter(!is.na(mes))  %>%
-  plot_ly(x = ~ mes,
-          y = ~ suma_registros,
-          type = "scatter", 
-          mode = "markers",
-          fill = "tozeroy") %>%
-  layout(title = "Estacionalidad",
-         xaxis = list(title = "Mes"),
-         yaxis = list(title = "Cantidad de registros"))
-```
-<br>
 
-# Grafico de historial
-
-```{r grafico_historial, message=FALSE, warning=FALSE}
-#grafico de historial por años
-junco_vulcani %>%
-  st_drop_geometry() %>%
-  group_by(anio = format(as.Date(eventDate, "%Y-%m-%d"), "%Y")) %>%
-  summarize(suma_registros = n()) %>%
-  filter(!is.na(anio))  %>%
-  filter(anio >= 2011) %>%
-  plot_ly(x = ~ anio,
-          y = ~ suma_registros,
-          type = "bar") %>%
-  layout(title = "Historial",
-         xaxis = list(title = "Año"),
-         yaxis = list(title = "Cantidad de registros"))
-```
-<br>
-
-# Mapa de distribucion
-
-```{r mapa_distribucion, message=FALSE, warning=FALSE}
-
-# Mapa de registros de presencia
-junco_vulcani %>%
-  select(stateProvince,
-         canton,
-         locality,
-         eventDate) %>%
-  leaflet() %>%
-  addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
-  addProviderTiles(providers$Stamen.TonerLite, group = "Stamen Toner Lite") %>%
-  addProviderTiles(providers$Esri.WorldImagery, group = "Imágenes de ESRI") %>%
-  addCircleMarkers(
-    stroke = F,
-    radius = 4,
-    fillColor = 'green',
-    fillOpacity = 1,
-    popup = paste(
-      junco_vulcani$stateProvince,
-      junco_vulcani$canton,
-      junco_vulcani$locality,
-      junco_vulcani$eventDate,
-      sep = '<br/>'
-    ),
-    group = "Junco vulcani"
-  ) %>%
-  addLayersControl(
-    baseGroups = c("OpenStreetMap", "Stamen Toner Lite", "Imágenes de ESRI"),
-    overlayGroups = c("JUnco vulcani")
-  ) %>%
-  addMiniMap(
-    tiles = providers$Stamen.OpenStreetMap.Mapnik,
-    position = "bottomleft",
-    toggleDisplay = TRUE
-  )
-
-```
-
+# Mapa 
