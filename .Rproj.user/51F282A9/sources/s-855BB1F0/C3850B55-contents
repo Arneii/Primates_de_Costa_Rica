@@ -70,8 +70,49 @@ primates %>%
     options = list(searchHighlight = TRUE)
   )
 ```
+<br>
 
 # Gráfico de pastel
 
+```{r grafixo_pastel, message=FALSE, warning=FALSE}
+# cargar colores
+colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)')
 
+#grafico pastel 
+plot_ly(
+  primates,
+  labels = ~ species,
+  type = "pie",
+  textposition = "inside",
+  textinfo = "label+percent",
+  insidetextfont = list(color = "#FFFFFF"),
+  marker = list(colors = colors)) %>%
+  layout(
+    title = "Cantidad de registros para cada especie de primate",
+    xaxis = list(
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showticklabels = FALSE
+    ),
+    yaxis = list(
+      showgrid = FALSE,
+      zeroline = FALSE,
+      showticklabels = FALSE
+    )
+  )
+```
+
+
+# Gráfico de registros de presencia por mes
+primates %>%
+  st_drop_geometry() %>%
+  group_by(mes = format(as.Date(eventDate, "%Y-%m-%d"), "%m")) %>%
+  summarize(suma_registros = n()) %>%
+  filter(!is.na(mes))  %>%
+  plot_ly(x = ~ mes,
+          y = ~ suma_registros) %>%
+  layout(title = "Registros de terciopelos (Bothrops asper) por mes",
+         xaxis = list(title = "Mes"),
+         yaxis = list(title = "Cantidad de registros"))
 # Mapa 
+
