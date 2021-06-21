@@ -3,10 +3,7 @@ title: "Especies de primates de Costa Rica "
 author: "Sara Alvarado Siles"
 output: html_document
 ---
----
-title: "El junco de los paramos (Junco valcani)"
-output: html_document
----
+
 ```{r setup, incluide=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
