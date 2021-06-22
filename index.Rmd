@@ -18,6 +18,7 @@ library(sf)
 library(DT)
 library(plotly)
 library(leaflet)
+library(raster)
 ```
 
 ```{r carga_datos, message=FALSE, warning=FALSE}
@@ -45,7 +46,7 @@ cantones <-
 
 ```
 
-```{r cruce_cantones, message=FALSE}
+```{r cruce_cantones, message=FALSE, warning=FALSE}
 # Cruce espacial con la tabla de cantones, para obtener el nombre del cantón
 primates <-
   primates %>%
@@ -55,6 +56,7 @@ primates <-
 
 # Introduccion
 Se utilisa el conjunto de datos sobre 4 especies de primates de Costa Rica.
+*Ateles geoffroyi*, *Cebus capucinus*, *Alouatta palliata*, *Saimiri oerstedii* que se refieren respectivamente al mono araña, mono carablanca, mono congo y mono ardilla.
 
 <br>
 
@@ -64,7 +66,7 @@ Se utilisa el conjunto de datos sobre 4 especies de primates de Costa Rica.
 # Tabla de registros de presencia
 primates %>%
   st_drop_geometry() %>%
-  select(family, species, stateProvince, canton, locality, eventDate) %>%
+  dplyr::select(family, species, stateProvince, canton, locality, eventDate) %>%
   datatable(
     colnames = c("Familia","Especie","Provincia", "Canton", "Localidad", "Fecha"),
     options = list(searchHighlight = TRUE)
@@ -72,9 +74,9 @@ primates %>%
 ```
 <br>
 
-# Gráfico de pastel
+# Gráfico pastel
 
-```{r grafixo_pastel, message=FALSE, warning=FALSE}
+```{r grafico_pastel, message=FALSE, warning=FALSE}
 # cargar colores
 colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)')
 
@@ -101,18 +103,238 @@ plot_ly(
     )
   )
 ```
+<br>
 
-
-# Gráfico de registros de presencia por mes
-primates %>%
-  st_drop_geometry() %>%
-  group_by(mes = format(as.Date(eventDate, "%Y-%m-%d"), "%m")) %>%
-  summarize(suma_registros = n()) %>%
-  filter(!is.na(mes))  %>%
-  plot_ly(x = ~ mes,
-          y = ~ suma_registros) %>%
-  layout(title = "Registros de terciopelos (Bothrops asper) por mes",
-         xaxis = list(title = "Mes"),
-         yaxis = list(title = "Cantidad de registros"))
 # Mapa 
 
+```{r capas_primates, message=FALSE, warning=FALSE}
+# Selección de la especie de primate
+# capa de Ateles geoffroyi
+Ateles_geoffroyi <-
+  primates %>%
+  filter(species == "Ateles geoffroyi")
+
+# capa de Cebus capucinus
+Cebus_capucinus <-
+  primates %>%
+  filter(species == "Cebus capucinus")
+
+# capa de Alouatta palliata
+Alouatta_palliata <-
+  primates %>%
+  filter(species == "Alouatta palliata")
+
+# capa de Saimiri oerstedii
+Saimiri_oerstedii <-
+  primates %>%
+  filter(species == "Saimiri oerstedii")
+```
+
+```{r capa_raster, message=FALSE, warning=FALSE}
+# Especificación del directorio de trabajo (debe utilizarse una ruta existente)
+setwd("C:/Users/SARA/Desktop/UCR/Procesamiento_de_datos_geograficos/Tareas y Proyectos/Tareas/Tarea03")
+
+# Obtención de la capa de altitud
+alt <- getData(
+  "worldclim",
+  var = "alt",
+  res = .5,
+  lon = -84,
+  lat = 10
+)
+
+# Capa de altitud recortada para los límites exactos de Costa Rica
+altitud <-
+  alt %>%
+  crop(cantones) %>%
+  mask(cantones)
+
+# Paleta de colores
+pal <- colorNumeric(
+  c("#006400", "#FFFF00", "chocolate1", "#FF0000"), 
+  values(altitud), 
+  na.color = "transparent"
+)
+
+```
+
+```{r mapa_registros, message=FALSE, warning=FALSE}
+# Mapa de registros de presencia
+primates %>%
+  dplyr::select(stateProvince,
+                canton,
+                locality,
+                eventDate,
+                family,
+                species) %>%
+  leaflet() %>%
+  addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
+  addProviderTiles(providers$Esri.WorldImagery, group = "Imágenes de ESRI") %>%
+  addRasterImage(
+    altitud, 
+    colors = pal, 
+    opacity = 0.8
+  ) %>%  
+  addPolygons(
+    data = cantones,
+    color = "black",
+    fillColor = "transparent",
+    stroke = TRUE,
+    weight = 1.0,
+  ) %>%
+  addCircleMarkers(
+    data = Ateles_geoffroyi,
+    stroke = F,
+    radius = 4,
+    fillColor = 'gray',
+    fillOpacity = 1,
+    popup = paste(
+      Ateles_geoffroyi$stateProvince,
+      Ateles_geoffroyi$canton,
+      Ateles_geoffroyi$locality,
+      Ateles_geoffroyi$eventDate,
+      Ateles_geoffroyi$family,
+      Ateles_geoffroyi$species,
+      sep = '<br/>'
+    ),
+    group = "Ateles_geoffroyi"
+  ) %>%
+  addCircleMarkers(
+    data = Cebus_capucinus,
+    stroke = F,
+    radius = 4,
+    fillColor = 'blue',
+    fillOpacity = 1,
+    popup = paste(
+      Cebus_capucinus$stateProvince,
+      Cebus_capucinus$canton,
+      Cebus_capucinus$locality,
+      Cebus_capucinus$eventDate,
+      Cebus_capucinus$family,
+      Cebus_capucinus$species,
+      sep = '<br/>'
+    ),
+    group = "Cebus_capucinus"
+  ) %>%
+  addCircleMarkers(
+    data = Alouatta_palliata,
+    stroke = F,
+    radius = 4,
+    fillColor = "orange",
+    fillOpacity = 1,
+    popup = paste(
+      Alouatta_palliata$stateProvince,
+      Alouatta_palliata$canton,
+      Alouatta_palliata$locality,
+      Alouatta_palliata$eventDate,
+      Alouatta_palliata$family,
+      Alouatta_palliata$species,
+      sep = '<br/>'
+    ),
+    group = "Alouatta_palliata"
+  ) %>%
+  addCircleMarkers(
+    data = Saimiri_oerstedii,
+    stroke = F,
+    radius = 4,
+    fillColor = 'red',
+    fillOpacity = 1,
+    popup = paste(
+      Saimiri_oerstedii$stateProvince,
+      Saimiri_oerstedii$canton,
+      Saimiri_oerstedii$locality,
+      Saimiri_oerstedii$eventDate,
+      Saimiri_oerstedii$family,
+      Saimiri_oerstedii$species,
+      sep = '<br/>'
+    ),
+    group = "Saimiri_oerstedii"
+  ) %>%
+  addLayersControl(
+    baseGroups = c("OpenStreetMap", "Imágenes de ESRI"),
+    overlayGroups = c(
+      "Ateles_geoffroyi",
+      "Cebus_capucinus",
+      "Alouatta_palliata",
+      "Saimiri_oerstedii"
+    )
+  ) %>%
+  addMiniMap(
+    tiles = providers$Stamen.OpenStreetMap.Mapnik,
+    position = "bottomleft",
+    toggleDisplay = TRUE
+  )
+```
+
+
+
+```{r extra1, message=FALSE, warning=FALSE}
+
+# Mapeo
+plot(altitud, main = "Distribucion de primates en Costa Rica")
+
+plot(
+  altitud,
+  extent = extent(-86, -82.3, 8, 11.3),
+  axes = TRUE,
+  graticule = TRUE,
+  reset = FALSE
+)
+plot(Saimiri_oerstedii, col = "red", add = TRUE)
+plot(Ateles_geoffroyi, col = "green", add = TRUE)
+plot(Alouatta_palliata, col = "orange", add = TRUE)
+plot(Cebus_capucinus, col = "blue", add = TRUE)
+```
+
+```{r mapa_raster_extra2, message=FALSE, warning=FALSE}
+
+# Paleta de colores
+pal <- colorNumeric(
+  c("#006400", "#FFFF00", "chocolate1", "#FF0000"), 
+  values(altitud), 
+  na.color = "transparent"
+)
+
+leaflet() %>%
+  addTiles() %>%
+  addRasterImage(
+    altitud, 
+    colors = pal, 
+    opacity = 0.8
+  ) %>%  
+  addPolygons(
+    data = cantones,
+    color = "black",
+    fillColor = "transparent",
+    stroke = TRUE,
+    weight = 1.0,
+  ) %>%
+  addCircleMarkers(
+    data = Saimiri_oerstedii,
+    stroke = F,
+    radius = 4,
+    fillColor = 'red',
+    fillOpacity = 0.8
+  )%>%
+  addCircleMarkers(
+    data = Ateles_geoffroyi,
+    stroke = F,
+    radius = 4,
+    fillColor = 'green',
+    fillOpacity = 0.8
+  )%>%
+  addCircleMarkers(
+    data = Alouatta_palliata,
+    stroke = F,
+    radius = 4,
+    fillColor = 'orange',
+    fillOpacity = 0.8
+  )%>%
+  addCircleMarkers(
+    data = Cebus_capucinus,
+    stroke = F,
+    radius = 4,
+    fillColor = 'blue',
+    fillOpacity = 0.8
+  )
+```
