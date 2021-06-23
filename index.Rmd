@@ -175,7 +175,7 @@ primates %>%
     altitud, 
     colors = pal, 
     opacity = 0.7,
-    group = "Capa raster"
+    group = "Capa raster de altitud"
   ) %>%  
   addPolygons(
     data = cantones,
