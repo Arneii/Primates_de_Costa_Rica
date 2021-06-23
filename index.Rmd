@@ -259,85 +259,12 @@ primates %>%
       "Cebus capucinus",
       "Alouatta palliata",
       "Saimiri oerstedii",
-      "Capa raster"
+      "Capa raster de altitud"
     )
   ) %>%
   addMiniMap(
     tiles = providers$Stamen.OpenStreetMap.Mapnik,
     position = "bottomleft",
     toggleDisplay = TRUE
-  )
-```
-
-
-
-```{r extra1, message=FALSE, warning=FALSE}
-
-# Mapeo
-plot(altitud, main = "Distribucion de primates en Costa Rica")
-
-plot(
-  altitud,
-  extent = extent(-86, -82.3, 8, 11.3),
-  axes = TRUE,
-  graticule = TRUE,
-  reset = FALSE
-)
-plot(Saimiri_oerstedii, col = "red", add = TRUE)
-plot(Ateles_geoffroyi, col = "green", add = TRUE)
-plot(Alouatta_palliata, col = "orange", add = TRUE)
-plot(Cebus_capucinus, col = "blue", add = TRUE)
-```
-
-```{r mapa_raster_extra2, message=FALSE, warning=FALSE}
-
-# Paleta de colores
-pal <- colorNumeric(
-  c("#006400", "#FFFF00", "chocolate1", "#FF0000"), 
-  values(altitud), 
-  na.color = "transparent"
-)
-
-leaflet() %>%
-  addTiles() %>%
-  addRasterImage(
-    altitud, 
-    colors = pal, 
-    opacity = 0.8
-  ) %>%  
-  addPolygons(
-    data = cantones,
-    color = "black",
-    fillColor = "transparent",
-    stroke = TRUE,
-    weight = 1.0,
-  ) %>%
-  addCircleMarkers(
-    data = Saimiri_oerstedii,
-    stroke = F,
-    radius = 4,
-    fillColor = 'red',
-    fillOpacity = 0.8
-  )%>%
-  addCircleMarkers(
-    data = Ateles_geoffroyi,
-    stroke = F,
-    radius = 4,
-    fillColor = 'green',
-    fillOpacity = 0.8
-  )%>%
-  addCircleMarkers(
-    data = Alouatta_palliata,
-    stroke = F,
-    radius = 4,
-    fillColor = 'orange',
-    fillOpacity = 0.8
-  )%>%
-  addCircleMarkers(
-    data = Cebus_capucinus,
-    stroke = F,
-    radius = 4,
-    fillColor = 'blue',
-    fillOpacity = 0.8
   )
 ```
