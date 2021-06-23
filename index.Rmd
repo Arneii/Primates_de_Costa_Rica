@@ -169,15 +169,17 @@ primates %>%
                 species) %>%
   leaflet() %>%
   addProviderTiles(providers$OpenStreetMap.Mapnik, group = "OpenStreetMap") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Stamen Toner Lite") %>%
   addProviderTiles(providers$Esri.WorldImagery, group = "Imágenes de ESRI") %>%
   addRasterImage(
     altitud, 
     colors = pal, 
-    opacity = 0.8
+    opacity = 0.7,
+    group = "Capa raster"
   ) %>%  
   addPolygons(
     data = cantones,
-    color = "black",
+    color = "tan4",
     fillColor = "transparent",
     stroke = TRUE,
     weight = 1.0,
@@ -187,7 +189,7 @@ primates %>%
     stroke = F,
     radius = 4,
     fillColor = 'gray',
-    fillOpacity = 1,
+    fillOpacity = 0.8,
     popup = paste(
       Ateles_geoffroyi$stateProvince,
       Ateles_geoffroyi$canton,
@@ -197,14 +199,14 @@ primates %>%
       Ateles_geoffroyi$species,
       sep = '<br/>'
     ),
-    group = "Ateles_geoffroyi"
+    group = "Ateles geoffroyi"
   ) %>%
   addCircleMarkers(
     data = Cebus_capucinus,
     stroke = F,
     radius = 4,
     fillColor = 'blue',
-    fillOpacity = 1,
+    fillOpacity = 0.8,
     popup = paste(
       Cebus_capucinus$stateProvince,
       Cebus_capucinus$canton,
@@ -214,14 +216,14 @@ primates %>%
       Cebus_capucinus$species,
       sep = '<br/>'
     ),
-    group = "Cebus_capucinus"
+    group = "Cebus capucinus"
   ) %>%
   addCircleMarkers(
     data = Alouatta_palliata,
     stroke = F,
     radius = 4,
     fillColor = "orange",
-    fillOpacity = 1,
+    fillOpacity = 0.8,
     popup = paste(
       Alouatta_palliata$stateProvince,
       Alouatta_palliata$canton,
@@ -231,14 +233,14 @@ primates %>%
       Alouatta_palliata$species,
       sep = '<br/>'
     ),
-    group = "Alouatta_palliata"
+    group = "Alouatta palliata"
   ) %>%
   addCircleMarkers(
     data = Saimiri_oerstedii,
     stroke = F,
     radius = 4,
     fillColor = 'red',
-    fillOpacity = 1,
+    fillOpacity = 0.8,
     popup = paste(
       Saimiri_oerstedii$stateProvince,
       Saimiri_oerstedii$canton,
@@ -248,15 +250,16 @@ primates %>%
       Saimiri_oerstedii$species,
       sep = '<br/>'
     ),
-    group = "Saimiri_oerstedii"
+    group = "Saimiri oerstedii"
   ) %>%
   addLayersControl(
-    baseGroups = c("OpenStreetMap", "Imágenes de ESRI"),
+    baseGroups = c("OpenStreetMap", "Stamen Toner Lite", "Imágenes de ESRI"),
     overlayGroups = c(
-      "Ateles_geoffroyi",
-      "Cebus_capucinus",
-      "Alouatta_palliata",
-      "Saimiri_oerstedii"
+      "Ateles geoffroyi",
+      "Cebus capucinus",
+      "Alouatta palliata",
+      "Saimiri oerstedii",
+      "Capa raster"
     )
   ) %>%
   addMiniMap(
