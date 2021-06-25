@@ -127,7 +127,7 @@ Crear el gráfico pastel.
 
 ```{r grafico_pastel, message=FALSE, warning=FALSE}
 #grafico pastel 
-p <- plot_ly(
+grafico_pastel <- plot_ly(
   primates,
   labels = ~ species,
   type = "pie",
@@ -152,7 +152,7 @@ p <- plot_ly(
     ) 
   )
   
-config (p, locale = "es")
+config (grafico_pastel, locale = "es")
 ```
 <br>
 
