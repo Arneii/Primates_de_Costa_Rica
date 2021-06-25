@@ -127,16 +127,16 @@ Crear el gráfico pastel.
 
 ```{r grafico_pastel, message=FALSE, warning=FALSE}
 #grafico pastel 
-plot_ly(
+p <- plot_ly(
   primates,
   labels = ~ species,
   type = "pie",
   textposition = "inside",
   textinfo = "label+percent",
+  insidetextorientation = "auto",
   insidetextfont = list(color = "#FFFFFF"),
   marker = list(colors = colors),
-  showlegend = FALSE,
-  insidetextorientation='radial'
+  showlegend = FALSE
 ) %>%
   layout(
     title = "Cantidad de registros para cada especie de primate",
@@ -144,13 +144,15 @@ plot_ly(
       showgrid = FALSE,
       zeroline = FALSE,
       showticklabels = FALSE
-    ))
+    ),
     yaxis = list(
       showgrid = FALSE,
       zeroline = FALSE,
       showticklabels = FALSE
-    )
+    ) 
+  )
   
+config (p, locale = "es")
 ```
 <br>
 
